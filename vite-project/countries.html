@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Countries & Cities</title>
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  />
+  <style>
+    body {
+      padding-top: 20px;
+      background: #f8f9fa;
+    }
+    .card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+      cursor: pointer;
+    }
+    #loader, #citiesLoader {
+      display: none;
+    }
+    #citiesContainer {
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1 class="mb-4 text-center">Countries & Major Cities</h1>
+    <div class="mb-3">
+      <input
+        type="text"
+        id="searchBox"
+        class="form-control"
+        placeholder="Search countries..."
+      />
+    </div>
+    <div id="loader" class="text-center my-4">
+      <div class="spinner-border" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
+    <div id="countriesContainer" class="row g-3"></div>
+    <div id="citiesContainer"></div>
+  </div>
+
+  <script>
+    const API_KEY = 'bb177be0ccmsh4dc21f5df856375p1cd752jsn37fb34f1ec44';
+    const BASE = 'https://wft-geo-db.p.rapidapi.com/v1/geo';
+
+    const headers = {
+      'X-RapidAPI-Key': API_KEY,
+      'X-RapidAPI-Host': 'wft-geo-db.p.rapidapi.com',
+    };
+
+    const searchBox = document.getElementById('searchBox');
+    const countriesContainer = document.getElementById('countriesContainer');
+    const loader = document.getElementById('loader');
+    const citiesContainer = document.getElementById('citiesContainer');
+
+    let countries = [];
+
+    async function fetchCountries() {
+      loader.style.display = 'block';
+      const res = await fetch(`${BASE}/countries`, { headers });
+      const data = await res.json();
+      countries = data.data;
+      renderCountries(countries);
+      loader.style.display = 'none';
+    }
+
+    function renderCountries(list) {
+      countriesContainer.innerHTML = '';
+      list.forEach((c) => {
+        const col = document.createElement('div');
+        col.className = 'col-12 col-md-6 col-lg-4';
+        col.innerHTML = `
+          <div class="card h-100" data-code="${c.code}">
+            <div class="card-body">
+              <h5 class="card-title">${c.name}</h5>
+              <p class="card-text">Code: ${c.code}</p>
+              <p class="card-text">Population: ${c.population.toLocaleString()}</p>
+            </div>
+          </div>`;
+        col.querySelector('.card').addEventListener('click', () => {
+          fetchCities(c.code, c.name);
+        });
+        countriesContainer.appendChild(col);
+      });
+    }
+
+    async function fetchCities(code, countryName) {
+      citiesContainer.innerHTML = `
+        <h2 class="mt-4">Major cities in ${countryName}</h2>
+        <div id="citiesLoader" class="text-center my-4">
+          <div class="spinner-border" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+        </div>
+        <div id="citiesList" class="row g-3"></div>`;
+      const citiesLoader = document.getElementById('citiesLoader');
+      const citiesList = document.getElementById('citiesList');
+      citiesLoader.style.display = 'block';
+      const res = await fetch(`${BASE}/countries/${code}/cities`, { headers });
+      const data = await res.json();
+      citiesLoader.style.display = 'none';
+      citiesList.innerHTML = '';
+      data.data.forEach((city) => {
+        const col = document.createElement('div');
+        col.className = 'col-12 col-md-6 col-lg-4';
+        col.innerHTML = `
+          <div class="card h-100">
+            <div class="card-body">
+              <h5 class="card-title">${city.name}</h5>
+              <p class="card-text">Population: ${city.population.toLocaleString()}</p>
+            </div>
+          </div>`;
+        citiesList.appendChild(col);
+      });
+    }
+
+    searchBox.addEventListener('input', () => {
+      const term = searchBox.value.toLowerCase();
+      const filtered = countries.filter((c) =>
+        c.name.toLowerCase().includes(term)
+      );
+      renderCountries(filtered);
+    });
+
+    fetchCountries();
+  </script>
+</body>
+</html>
