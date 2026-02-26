@@ -1,4 +1,4 @@
-import { fetchCities } from './vite-project/src/services/countryApi.js';
+import { fetchCities } from './src/services/countryApi.js';
 
 ;(async () => {
   try {

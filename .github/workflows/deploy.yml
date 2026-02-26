@@ -1,0 +1,56 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: ["main"]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  build_site:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build
+        run: npm run build
+        env:
+          VITE_OPENWEATHER_KEY: ${{ secrets.VITE_OPENWEATHER_KEY }}
+          VITE_YOUTUBE_KEY: ${{ secrets.VITE_YOUTUBE_KEY }}
+          VITE_MOVIEDB_KEY: ${{ secrets.VITE_MOVIEDB_KEY }}
+
+      - name: Copy index.html to 404.html
+        run: cp dist/index.html dist/404.html
+
+      - name: Upload Artifacts
+        uses: actions/upload-pages-artifact@v3
+        with:
+          # this should match the `dist` folder created by vite
+          path: "./dist"
+
+  deploy:
+    needs: build_site
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
