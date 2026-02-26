@@ -5,7 +5,8 @@ export default function Home() {
     { title: 'Weather', path: '/weather', icon: '🌤️' },
     { title: 'Cuisine', path: '/cuisine', icon: '🍳' },
     { title: 'YouTube', path: '/youtube', icon: '📹' },
-    { title: 'Movies', path: '/movies', icon: '🎬' }
+    { title: 'Movies', path: '/movies', icon: '🎬' },
+    { title: 'Countries', path: '/countries', icon: '🌎' }
   ]
 
   return (
@@ -43,6 +44,7 @@ export default function Home() {
                       {c.title === 'Cuisine' && 'Discover delicious cuisine'}
                       {c.title === 'YouTube' && 'Search videos and content'}
                       {c.title === 'Movies' && 'See trending and search movies'}
+                      {c.title === 'Countries' && 'Explore global data and cities'}
                     </p>
                   </div>
                 </div>

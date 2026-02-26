@@ -45,6 +45,11 @@ export default function Navbar() {
                 Movies
               </Link>
             </li>
+            <li className="nav-item">
+              <Link className="nav-link" to="/countries">
+                Countries
+              </Link>
+            </li>
           </ul>
         </div>
       </div>
