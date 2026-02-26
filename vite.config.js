@@ -4,5 +4,6 @@ import react from '@vitejs/plugin-react'
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
-  base: '/rct_info-hub/', // Set this to your repository name for GitHub Pages
+  base: process.env.NODE_ENV === 'production' ? '/' : '/', // Default to root for Vercel
+  // Note: For GitHub Pages, you might need to change this to '/rct_info-hub/'
 })
